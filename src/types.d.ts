@@ -7,11 +7,20 @@ interface CreepMemory {
     role: "homestead" | "pioneer";
     room: string;
     working: boolean;
+    sourceId: string;
 }
 
 interface Memory {
     uuid: number;
     log: any;
+    spawner: {
+        [roomName: string]: {
+            [sourceId: string]: {
+                role: string;
+                count: number;
+            };
+        };
+    };
 }
 
 // `global` extension samples

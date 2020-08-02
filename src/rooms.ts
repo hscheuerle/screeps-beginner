@@ -20,7 +20,6 @@ export const spawnerSetup = () => {
 export const spawnerLoop = () => {
     const spawn: StructureSpawn = Game.spawns.Spawn1;
     const room: Room = spawn.room;
-
     const orders = Object.entries(Memory.spawner[room.name]);
     const creeps = Object.values(Game.creeps);
     // let orderSource = ;
@@ -41,6 +40,7 @@ export const spawnerLoop = () => {
         const { role } = Memory.spawner[room.name][memKey];
         const available = room.energyAvailable;
 
+        // Fix role key because idk why its having issues and it lead to mistake offline.
         spawn.spawnCreep(getBuild(available), Game.time.toString(), {
             memory: {
                 role: role as "homestead" | "pioneer",
@@ -61,7 +61,7 @@ type ForEachSourceExposureCB = (value: SourceExposure, index: number) => void;
 function addSpawnerSourceEntry(memorySpawner: Memory["spawner"], room: Room): ForEachSourceExposureCB {
     return (sourceExposure, index) => {
         memorySpawner[room.name][sourceExposure.source.id.toString()] = {
-            role: index === 0 ? "homestead" : "poineer",
+            role: index === 0 ? "homestead" : "pioneer",
             count: sourceExposure.count
         };
     };

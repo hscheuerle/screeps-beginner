@@ -1,10 +1,14 @@
-import * as rolesHomestead from "./homestead";
+import * as roles from "./creeps";
+import * as room from 'rooms';
 import { ErrorMapper } from "utils/ErrorMapper";
 import { Role } from "consts";
+import { getBuild } from "rooms.util";
 
 // When compiling TS to JS and bundling with rollup, the line numbers and file names in error messages change
 // This utility uses source maps to get the line numbers and file names of the original, TS source code
 export const loop = ErrorMapper.wrapLoop(() => {
+    room.run();
+
     console.log(`Current game tick is ${Game.time}`);
 
     // Automatically delete memory of missing creeps
@@ -14,13 +18,18 @@ export const loop = ErrorMapper.wrapLoop(() => {
         }
     }
 
+    const available = Game.spawns.Spawn1.room.energyAvailable;
+    const body = getBuild(available);
+
     if (needHomesteads()) {
-        spawnHomestead();
+        spawnHomestead(body);
     } else if (needPioneers()) {
-        spawnPioneer();
+        spawnPioneer(body);
     }
 
-    rolesHomestead.run();
+    roles.runHomesteads();
+    roles.runPioneers();
+
 });
 
 function needHomesteads() {
@@ -28,11 +37,11 @@ function needHomesteads() {
 }
 
 function needPioneers() {
-    return getUnitCountByRole("pioneer");
+    return getUnitCountByRole("pioneer") < 3;
 }
 
-function spawnHomestead() {
-    Game.spawns.Spawn1.spawnCreep([WORK, MOVE, MOVE, CARRY, CARRY], `homestead-${Game.time}`, {
+function spawnHomestead(body: BodyPartConstant[]) {
+    Game.spawns.Spawn1.spawnCreep(body, `homestead-${Game.time}`, {
         memory: {
             role: "homestead",
             room: Game.spawns.Spawn1.room.name,
@@ -41,8 +50,8 @@ function spawnHomestead() {
     });
 }
 
-function spawnPioneer() {
-    Game.spawns.Spawn1.spawnCreep([WORK, MOVE, MOVE, CARRY, CARRY], `homestead-${Game.time}`, {
+function spawnPioneer(body: BodyPartConstant[]) {
+    Game.spawns.Spawn1.spawnCreep(body, `pioneer-${Game.time}`, {
         memory: {
             role: "pioneer",
             room: Game.spawns.Spawn1.room.name,

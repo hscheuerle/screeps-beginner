@@ -25,7 +25,7 @@ export const spawnerLoop = () => {
     const creeps = Object.values(Game.creeps);
     // let orderSource = ;
 
-    // will find harvesters since source is first when accessing keys now, need error checking though.
+    // will find homesteads since source is first when accessing keys now, need error checking though.
     const nextBuild = getSourceExposures(room)
         .sort(sortSourceExposuresByDistanceToSpawn(spawn))
         .find(exposure => {
@@ -61,7 +61,7 @@ type ForEachSourceExposureCB = (value: SourceExposure, index: number) => void;
 function addSpawnerSourceEntry(memorySpawner: Memory["spawner"], room: Room): ForEachSourceExposureCB {
     return (sourceExposure, index) => {
         memorySpawner[room.name][sourceExposure.source.id.toString()] = {
-            role: index === 0 ? "harvester" : "poineer",
+            role: index === 0 ? "homestead" : "poineer",
             count: sourceExposure.count
         };
     };

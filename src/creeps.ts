@@ -24,23 +24,21 @@ export function runHomesteads(): void {
 }
 
 export function runPioneers(): void {
-    const source = getRoomResourcesSortedByDistance(Game.spawns.Spawn1)[2];
-
     Object.entries(Game.creeps)
-    .filter(([, creep]) => creep.memory.role === 'pioneer')
-    .forEach(([, pioneer]) => {
-        uc.setHarvestingState(pioneer);
+        .filter(([, creep]) => creep.memory.role === "pioneer")
+        .forEach(([, pioneer]) => {
+            uc.setHarvestingState(pioneer);
 
-        if (pioneer.memory.working) {
-            uc.harvestSource(pioneer, source);
-        } else if (uc.transferAnyContainer(pioneer)) {
-            console.log("transferAnyContainer");
-        } else if (uc.buildClosestConstructionSite(pioneer)) {
-            console.log("buildClosestConstructionSite");
-        } else if (uc.upgradeController(pioneer, CONTROLLER)) {
-            console.log("do nothing");
-        }
-    });
+            if (pioneer.memory.working) {
+                uc.harvestSource(pioneer, Game.getObjectById(pioneer.memory.sourceId));
+            } else if (uc.transferAnyContainer(pioneer)) {
+                console.log("transferAnyContainer");
+            } else if (uc.buildClosestConstructionSite(pioneer)) {
+                console.log("buildClosestConstructionSite");
+            } else if (uc.upgradeController(pioneer, CONTROLLER)) {
+                console.log("do nothing");
+            }
+        });
 }
 
 // Game.spawns.Spawn1.room.createConstructionSite(source.pos.x - 2, source.pos.y, STRUCTURE_EXTENSION);

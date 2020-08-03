@@ -1,5 +1,5 @@
 import { testRoomStuff, getSourceExposure as getSourceExposures, getBuild } from "rooms.util";
-
+const TEMP_CREEP_BUFFER = 2;
 // instead use reduce and create room.name entry as value can be assigned to it in one step.
 export const spawnerSetup = () => {
     const spawn: StructureSpawn = Game.spawns.Spawn1;
@@ -62,7 +62,7 @@ function addSpawnerSourceEntry(memorySpawner: Memory["spawner"], room: Room): Fo
     return (sourceExposure, index) => {
         memorySpawner[room.name][sourceExposure.source.id.toString()] = {
             role: index === 0 ? "homestead" : "pioneer",
-            count: sourceExposure.count
+            count: sourceExposure.count + TEMP_CREEP_BUFFER
         };
     };
 }

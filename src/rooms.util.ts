@@ -55,6 +55,11 @@ export const testRoomStuff = (room: Room) => {
 
 /** the number of locations a resource can be harvested from. */
 export const getSourceExposures = (room: Room): { source: Source; count: number }[] => {
+    if (!(room instanceof Room)) {
+        console.log("room wasnt instance of rooom!!");
+        console.log(room);
+        return [];
+    }
     const sources = room.find(FIND_SOURCES);
     const terrain = room.getTerrain();
 

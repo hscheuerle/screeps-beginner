@@ -44,7 +44,8 @@ export function harvestSource(creep: Creep, resource: Source | null): boolean {
     const res = creep.harvest(resource);
 
     if (res === ERR_NOT_IN_RANGE) {
-        creep.moveTo(resource.pos.x, resource.pos.y); // this doesn't work because rooms are messed up
+        const moveRes = creep.moveTo(resource.pos.x, resource.pos.y); // this doesn't work because rooms are messed up
+        console.log("not in range", moveRes);
     } else if (res === OK) {
         console.log(creep.room, "ok", creep.memory.sourceId);
     } else {

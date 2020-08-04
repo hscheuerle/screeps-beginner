@@ -14,19 +14,21 @@ export const spawnerSetup = () => {
         .sort(sortSourceExposuresByDistanceToSpawn(spawn))
         .forEach(addSpawnerSourceEntry(memorySpawner, room));
 
-    getSourceExposures(Game.rooms.E4S27).forEach(sourceExposure => {
-        memorySpawner[sourceExposure.source.id.toString()] = {
-            role: "pioneer",
-            count: sourceExposure.count + 2
-        };
-    });
+    if (Game.rooms.E4S27) {
+        getSourceExposures(Game.rooms.E4S27).forEach(sourceExposure => {
+            memorySpawner[sourceExposure.source.id.toString()] = {
+                role: "pioneer",
+                count: sourceExposure.count + 2
+            };
+        });
+    }
 
     console.log(memorySpawner);
     console.log(secondary);
 
     Memory["spawner"] = {
-        [room.name]: { ...memorySpawner },
-        [Game.rooms.E4S27.name]: { ...secondary }
+        [room.name]: { ...memorySpawner }
+        // [Game.rooms.E4S27.name]: { ...secondary }
     } as any;
 };
 

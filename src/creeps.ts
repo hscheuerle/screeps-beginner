@@ -28,20 +28,25 @@ export function runPioneers(): void {
     Object.entries(Game.creeps)
         .filter(([, creep]) => creep.memory.role === "pioneer")
         .forEach(([, pioneer]) => {
-            if (pioneer.room.name != pioneer.memory.room) {
-                const exitDir = Game.map.findExit(pioneer.room, pioneer.memory.room);
-                if (exitDir) {
-                    const exit = pioneer.pos.findClosestByRange(exitDir as any);
-                    pioneer.moveTo(exit as any);
-                    return;
-                }
-            }
+            // if (pioneer.room.name != pioneer.memory.room) {
+            //     const exitDir = Game.map.findExit(pioneer.room, pioneer.memory.room);
+            //     if (exitDir) {
+            //         const exit = pioneer.pos.findClosestByRange(exitDir as any);
+            //         pioneer.moveTo(exit as any);
+            //         return;
+            //     }
+            // }
 
             uc.setHarvestingState(pioneer);
 
             if (pioneer.memory.working) {
-                uc.harvestSource(pioneer, Game.getObjectById(pioneer.memory.sourceId));
-                console.log("harvest", pioneer.memory.sourceId);
+                const source = Game.getObjectById(pioneer.memory.sourceId) as Source;
+                if (!source) {
+                    pioneer.moveTo(10, 0);
+                } else {
+                    uc.harvestSource(pioneer, source);
+                    console.log("harvest", pioneer.memory.sourceId);
+                }
             } else if (uc.transferAnyContainer(pioneer)) {
                 console.log("transferAnyContainer");
             } else if (uc.buildClosestConstructionSite(pioneer)) {

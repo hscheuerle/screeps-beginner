@@ -9,4 +9,6 @@ export const loop = ErrorMapper.wrapLoop(() => {
     spawnerLoop(); // TODO: will fail in sim, since it doesn't account for that op unit by the one resource!
     roles.runHomesteads();
     roles.runPioneers();
+    roles.runDefense();
+    roles.runClaim();
 });

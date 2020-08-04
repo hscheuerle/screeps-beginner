@@ -14,6 +14,30 @@ export const Workers = {
     550: [WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE]
 } as const;
 
+export const Offense = {
+    ATTACK: [
+        ATTACK,
+        ATTACK,
+        ATTACK,
+        ATTACK,
+        TOUGH,
+        TOUGH,
+        TOUGH,
+        TOUGH,
+        TOUGH,
+        TOUGH,
+        MOVE,
+        MOVE,
+        MOVE,
+        MOVE,
+        MOVE,
+        MOVE,
+        MOVE,
+        MOVE
+    ],
+    CLAIM: [CLAIM, MOVE, MOVE, MOVE, MOVE]
+};
+
 export const minMax = Object.keys(Workers)
     .map(string => parseInt(string, 10))
     .reduce((range, cost) => [Math.min(range[0], cost), Math.max(range[1], cost)], [

@@ -4,7 +4,7 @@
 
 // memory extension samples
 interface CreepMemory {
-    role: "homestead" | "pioneer";
+    role: "homestead" | "pioneer" | "defense" | "claimer";
     room: string;
     working: boolean;
     sourceId: string;

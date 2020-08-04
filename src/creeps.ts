@@ -41,6 +41,49 @@ export function runPioneers(): void {
         });
 }
 
+export function runDefense() {
+    Object.entries(Game.creeps)
+        .filter(([, creep]) => creep.memory.role === "defense")
+        .forEach(([, defender]) => {
+            if (defender.memory.sourceId) {
+                const target = Game.getObjectById(defender.memory.sourceId);
+                if (target instanceof Creep) {
+                    const res = defender.attack(target);
+                    if (res === ERR_NOT_IN_RANGE) {
+                        defender.moveTo(target);
+                    }
+                } else {
+                    console.log("invalid attack target");
+                }
+            } else {
+                const stagingFlag: Flag = Game.flags.staging;
+                if (stagingFlag) {
+                    defender.moveTo(stagingFlag);
+                }
+            }
+        });
+}
+
+export function runClaim() {
+    Object.entries(Game.creeps)
+        .filter(([, creep]) => creep.memory.role === "claimer")
+        .forEach(([, claimer]) => {
+            if (claimer.memory.sourceId) {
+                const target = Game.getObjectById(claimer.memory.sourceId);
+                if (target instanceof StructureController) {
+                    const res = claimer.claimController(target);
+                } else {
+                    console.log("invalid claim target");
+                }
+            } else {
+                const stagingFlag: Flag = Game.flags.staging;
+                if (stagingFlag) {
+                    claimer.moveTo(stagingFlag);
+                }
+            }
+        });
+}
+
 // Game.spawns.Spawn1.room.createConstructionSite(source.pos.x - 2, source.pos.y, STRUCTURE_EXTENSION);
 // Game.spawns.Spawn1.room.createConstructionSite(source.pos.x + 2, source.pos.y, STRUCTURE_EXTENSION);
 // Game.spawns.Spawn1.room.createConstructionSite(source.pos.x, source.pos.y - 2, STRUCTURE_EXTENSION);

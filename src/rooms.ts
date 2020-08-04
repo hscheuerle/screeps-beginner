@@ -1,5 +1,6 @@
 import { testRoomStuff, getSourceExposure as getSourceExposures, getBuild } from "rooms.util";
-const TEMP_CREEP_BUFFER = 2;
+import { Offense } from "consts";
+const TEMP_CREEP_BUFFER = 0;
 // instead use reduce and create room.name entry as value can be assigned to it in one step.
 export const spawnerSetup = () => {
     const spawn: StructureSpawn = Game.spawns.Spawn1;
@@ -48,6 +49,10 @@ export const spawnerLoop = () => {
                 sourceId: memKey,
                 working: true
             }
+        });
+    } else {
+        spawn.spawnCreep(Offense.ATTACK, "defense" + Game.time, {
+            memory: { role: "defense", room: "", sourceId: "", working: true }
         });
     }
 };

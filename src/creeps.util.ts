@@ -37,13 +37,18 @@ export function buildClosestConstructionSite(creep: Creep): boolean {
 
 export function harvestSource(creep: Creep, resource: Source | null): boolean {
     if (!resource) {
+        console.log("no resource");
         return false;
     }
 
     const res = creep.harvest(resource);
 
     if (res === ERR_NOT_IN_RANGE) {
-        creep.moveTo(resource.pos.x, resource.pos.y);
+        creep.moveTo(resource.pos.x, resource.pos.y); // this doesn't work because rooms are messed up
+    } else if (res === OK) {
+        console.log(creep.room, "ok", creep.memory.sourceId);
+    } else {
+        console.log(creep.room, "err", res);
     }
 
     return true;

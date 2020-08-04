@@ -1,5 +1,4 @@
 import * as uc from "./creeps.util";
-import { getRoomResourcesSortedByDistance } from "rooms.util";
 
 const RESOURCE = Game.spawns.Spawn1.pos.findClosestByRange(FIND_SOURCES);
 const CONTROLLER = Game.spawns.Spawn1.room.controller || null;
@@ -15,7 +14,9 @@ export function runHomesteads(): void {
                 uc.harvestSource(homestead, RESOURCE);
             } else if (uc.transferSpawn(homestead, Game.spawns.Spawn1)) {
                 console.log("transferSpawn");
-            } else if (uc.upgradeController(homestead, CONTROLLER)) {
+            }
+            // GCL not my cl!!!
+            else if (uc.upgradeController(homestead, CONTROLLER)) {
                 console.log("upgradeController");
             } else {
                 console.log("do nothing");
@@ -27,10 +28,20 @@ export function runPioneers(): void {
     Object.entries(Game.creeps)
         .filter(([, creep]) => creep.memory.role === "pioneer")
         .forEach(([, pioneer]) => {
+            if (pioneer.room.name != pioneer.memory.room) {
+                const exitDir = Game.map.findExit(pioneer.room, pioneer.memory.room);
+                if (exitDir) {
+                    const exit = pioneer.pos.findClosestByRange(exitDir as any);
+                    pioneer.moveTo(exit as any);
+                    return;
+                }
+            }
+
             uc.setHarvestingState(pioneer);
 
             if (pioneer.memory.working) {
                 uc.harvestSource(pioneer, Game.getObjectById(pioneer.memory.sourceId));
+                console.log("harvest", pioneer.memory.sourceId);
             } else if (uc.transferAnyContainer(pioneer)) {
                 console.log("transferAnyContainer");
             } else if (uc.buildClosestConstructionSite(pioneer)) {
@@ -47,10 +58,10 @@ export function runDefense() {
         .forEach(([, defender]) => {
             if (defender.memory.sourceId) {
                 const target = Game.getObjectById(defender.memory.sourceId);
-                if (target instanceof Creep) {
-                    const res = defender.attack(target);
+                if (target) {
+                    const res = defender.attack(target as Creep);
                     if (res === ERR_NOT_IN_RANGE) {
-                        defender.moveTo(target);
+                        defender.moveTo(target as Creep);
                     }
                 } else {
                     console.log("invalid attack target");
@@ -72,6 +83,11 @@ export function runClaim() {
                 const target = Game.getObjectById(claimer.memory.sourceId);
                 if (target instanceof StructureController) {
                     const res = claimer.claimController(target);
+                    if (res === ERR_NOT_IN_RANGE) {
+                        claimer.moveTo(target);
+                    } else {
+                        console.log("claimer-res", res);
+                    }
                 } else {
                     console.log("invalid claim target");
                 }

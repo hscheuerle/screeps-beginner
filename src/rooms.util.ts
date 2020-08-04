@@ -54,7 +54,7 @@ export const testRoomStuff = (room: Room) => {
 };
 
 /** the number of locations a resource can be harvested from. */
-export const getSourceExposure = (room: Room): { source: Source; count: number }[] => {
+export const getSourceExposures = (room: Room): { source: Source; count: number }[] => {
     const sources = room.find(FIND_SOURCES);
     const terrain = room.getTerrain();
 

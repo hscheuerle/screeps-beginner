@@ -1,20 +1,33 @@
-import { testRoomStuff, getSourceExposure as getSourceExposures, getBuild } from "rooms.util";
+import { getSourceExposures, getBuild } from "rooms.util";
 import { Offense } from "consts";
-const TEMP_CREEP_BUFFER = 0;
+
 // instead use reduce and create room.name entry as value can be assigned to it in one step.
 export const spawnerSetup = () => {
     const spawn: StructureSpawn = Game.spawns.Spawn1;
     const room: Room = spawn.room;
 
-    let memorySpawner: Memory["spawner"] = {
-        [room.name]: {}
-    };
+    let memorySpawner = {} as any;
+
+    let secondary = {} as any;
 
     getSourceExposures(room)
         .sort(sortSourceExposuresByDistanceToSpawn(spawn))
         .forEach(addSpawnerSourceEntry(memorySpawner, room));
 
-    Memory["spawner"] = memorySpawner;
+    getSourceExposures(Game.rooms.E4S27).forEach(sourceExposure => {
+        memorySpawner[sourceExposure.source.id.toString()] = {
+            role: "pioneer",
+            count: sourceExposure.count + 2
+        };
+    });
+
+    console.log(memorySpawner);
+    console.log(secondary);
+
+    Memory["spawner"] = {
+        [room.name]: { ...memorySpawner },
+        [Game.rooms.E4S27.name]: { ...secondary }
+    } as any;
 };
 
 // need to give source to creep memory so creeps can be renewed to specific sources when created.
@@ -27,6 +40,7 @@ export const spawnerLoop = () => {
 
     // will find homesteads since source is first when accessing keys now, need error checking though.
     const nextBuild = getSourceExposures(room)
+        .concat(getSourceExposures(Game.rooms.E4S27))
         .sort(sortSourceExposuresByDistanceToSpawn(spawn))
         .find(exposure => {
             const sourceValue = Memory.spawner[room.name][exposure.source.id.toString()];
@@ -51,9 +65,13 @@ export const spawnerLoop = () => {
             }
         });
     } else {
-        spawn.spawnCreep(Offense.ATTACK, "defense" + Game.time, {
-            memory: { role: "defense", room: "", sourceId: "", working: true }
-        });
+        // spawn.spawnCreep(Offense.ATTACK, "defense" + Game.time, {
+        //     memory: { role: "defense", room: "", sourceId: "", working: true }
+        // });
+        // spawn.spawnCreep(Offense.CLAIM, "claim-" + Game.time, {
+        //     memory: { role: "claimer", room: "", sourceId: "", working: true }
+        // });
+        // TODO: for claimers, there's 4 available areas of attack on that enemy controller.
     }
 };
 
@@ -63,11 +81,11 @@ type SourceExposure = { source: Source; count: number };
 type SortSourceExposureCB = (a: SourceExposure, b: SourceExposure) => number;
 type ForEachSourceExposureCB = (value: SourceExposure, index: number) => void;
 
-function addSpawnerSourceEntry(memorySpawner: Memory["spawner"], room: Room): ForEachSourceExposureCB {
+function addSpawnerSourceEntry(memorySpawner: any, room: Room): ForEachSourceExposureCB {
     return (sourceExposure, index) => {
-        memorySpawner[room.name][sourceExposure.source.id.toString()] = {
+        memorySpawner[sourceExposure.source.id.toString()] = {
             role: index === 0 ? "homestead" : "pioneer",
-            count: sourceExposure.count + TEMP_CREEP_BUFFER
+            count: index === 0 ? sourceExposure.count : sourceExposure.count + 2
         };
     };
 }

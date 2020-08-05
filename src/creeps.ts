@@ -61,21 +61,11 @@ export function runRemoteMiners() {
     Object.entries(Game.creeps)
         .filter(([, creep]) => creep.memory.role === "remote-miner")
         .forEach(([, remoteMiner]) => {
-            const { flagName } = remoteMiner.memory;
-            if (!flagName) return;
-            const flag = Game.flags[flagName];
-            if (!flag) return;
-            try {
-                const energy = flag.pos.findClosestByRange(FIND_SOURCES) as Source;
-                console.log(energy);
-                const res = remoteMiner.harvest(energy as Source);
-                if (res === ERR_NOT_IN_RANGE) {
-                    remoteMiner.moveTo(energy);
-                } else {
-                    console.log("!!!" + res);
-                }
-            } catch {
-                remoteMiner.moveTo(flag);
+            uc.setHarvestingState(remoteMiner);
+            if (remoteMiner.memory.working) {
+                harvestRemote(remoteMiner);
+            } else if (uc.upgradeController(remoteMiner, CONTROLLER)) {
+                console.log("upgrade");
             }
         });
 }
@@ -132,3 +122,22 @@ export function runClaim() {
 // Game.spawns.Spawn1.room.createConstructionSite(source.pos.x + 2, source.pos.y, STRUCTURE_EXTENSION);
 // Game.spawns.Spawn1.room.createConstructionSite(source.pos.x, source.pos.y - 2, STRUCTURE_EXTENSION);
 // Game.spawns.Spawn1.room.createConstructionSite(source.pos.x, source.pos.y + 2, STRUCTURE_EXTENSION);
+
+export function harvestRemote(remoteMiner: Creep) {
+    const { flagName } = remoteMiner.memory;
+    if (!flagName) return;
+    const flag = Game.flags[flagName];
+    if (!flag) return;
+    try {
+        const energy = flag.pos.findClosestByRange(FIND_SOURCES) as Source;
+        console.log(energy);
+        const res = remoteMiner.harvest(energy as Source);
+        if (res === ERR_NOT_IN_RANGE) {
+            remoteMiner.moveTo(energy);
+        } else {
+            console.log("!!!" + res);
+        }
+    } catch {
+        remoteMiner.moveTo(flag);
+    }
+}

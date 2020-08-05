@@ -25,6 +25,7 @@ interface Memory {
     remote: {
         [flagName: string]: number;
     };
+    alarmSounded: boolean;
 }
 
 // `global` extension samples

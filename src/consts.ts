@@ -6,14 +6,15 @@ export const Roles = {
 export type Role = typeof Roles[keyof typeof Roles];
 
 // adding a worker will automatically create these workers if enough energy available.
+// FIX: missing 50 increments cause errors, since it limits to max, but won't find next possible value.
 export const Workers = {
-    300: [WORK, CARRY, CARRY, MOVE, MOVE],
-    350: [WORK, CARRY, MOVE, MOVE, MOVE],
+    300: [WORK, CARRY, MOVE, MOVE, MOVE],
+    350: [WORK, CARRY, CARRY, MOVE, MOVE, MOVE],
     400: [WORK, WORK, CARRY, MOVE, MOVE, MOVE],
     450: [WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE],
-    500: [WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE],
-    550: [WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE],
-    800: [WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE]
+    500: [WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE],
+    550: [WORK, WORK, WORK, CARRY, MOVE, MOVE, MOVE, MOVE]
+    // 800: [WORK, WORK, WORK, WORK, CARRY, CARRY, MOVE, MOVE, MOVE, MOVE, MOVE, MOVE]
 } as const;
 
 export const Offense = {

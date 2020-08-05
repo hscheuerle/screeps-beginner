@@ -1,4 +1,5 @@
 import { getSourceExposures, getBuild } from "rooms.util";
+import { spawnFlagCreepCheck } from "capabilites/flag-driven-mining";
 
 // instead use reduce and create room.name entry as value can be assigned to it in one step.
 export const spawnerSetup = () => {
@@ -48,7 +49,8 @@ export const spawnerLoop = () => {
             }
         });
     } else {
-        checkRemoteMinerSpawns(spawn, room);
+        spawnFlagCreepCheck();
+        // checkRemoteMinerSpawns(spawn, room);
     }
 };
 

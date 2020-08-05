@@ -5,7 +5,7 @@
 // - get the owner of the unit if possible. (add to memory?)
 // - enable safe mode if available.
 // - send a notification if possible to email.
-// - add attack units to queue.
+// - add attack "role:antibody" units to queue.
 // -
 export const checkAlarms = () => {
     if (!isAlarmAlreadyTripped()) return;

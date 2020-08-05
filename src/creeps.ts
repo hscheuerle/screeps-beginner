@@ -62,11 +62,9 @@ export function runRemoteMiners() {
         .filter(([, creep]) => creep.memory.role === "remote-miner")
         .forEach(([, remoteMiner]) => {
             uc.setHarvestingState(remoteMiner);
-            if (remoteMiner.memory.working) {
-                harvestRemote(remoteMiner);
-            } else if (uc.upgradeController(remoteMiner, CONTROLLER)) {
-                console.log("upgrade");
-            }
+            if (harvestRemote(remoteMiner)) return;
+            if (uc.buildClosestConstructionSite(remoteMiner)) return;
+            if (uc.upgradeController(remoteMiner, CONTROLLER)) return;
         });
 }
 
@@ -123,11 +121,15 @@ export function runClaim() {
 // Game.spawns.Spawn1.room.createConstructionSite(source.pos.x, source.pos.y - 2, STRUCTURE_EXTENSION);
 // Game.spawns.Spawn1.room.createConstructionSite(source.pos.x, source.pos.y + 2, STRUCTURE_EXTENSION);
 
-export function harvestRemote(remoteMiner: Creep) {
+export function harvestRemote(remoteMiner: Creep): boolean {
+    if (!remoteMiner.memory.working) return false;
+
     const { flagName } = remoteMiner.memory;
-    if (!flagName) return;
+    if (!flagName) return false;
+
     const flag = Game.flags[flagName];
-    if (!flag) return;
+    if (!flag) return false;
+
     try {
         const energy = flag.pos.findClosestByRange(FIND_SOURCES) as Source;
         console.log(energy);
@@ -140,4 +142,5 @@ export function harvestRemote(remoteMiner: Creep) {
     } catch {
         remoteMiner.moveTo(flag);
     }
+    return true;
 }

@@ -10,5 +10,6 @@ export const loop = ErrorMapper.wrapLoop(() => {
     roles.runHomesteads();
     roles.runPioneers();
     roles.runDefense();
+    roles.runRemoteMiners();
     // roles.runClaim();
 });

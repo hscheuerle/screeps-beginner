@@ -4,7 +4,8 @@
 
 // memory extension samples
 interface CreepMemory {
-    role: "homestead" | "pioneer" | "defense" | "claimer";
+    role: "homestead" | "pioneer" | "defense" | "claimer" | "remote-miner";
+    flagName?: string;
     room: string;
     working: boolean;
     sourceId: string;
@@ -20,6 +21,9 @@ interface Memory {
                 count: number;
             };
         };
+    };
+    remote: {
+        [flagName: string]: number;
     };
 }
 

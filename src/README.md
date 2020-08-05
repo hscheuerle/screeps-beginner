@@ -23,3 +23,5 @@
 -   Flags have many purposes in game. Because they are considered a player-owned object and their location is stored in memory, players often use them to mark sources for remote mining to allow creeps to navigate outside the room when using Game.getObjectById() would return NULL because the player does not have vision.
 -   would need to have unit travel into another room by exit, flag resources there, and keep the count and flag reference instead of resource references.
 -   so the allocator must save all terrain information, even though it seems to be more usefully to run the query each time, instead its extrememly brittle and must be dynamically maintained only when units are present in an adjacent room.
+-   harvest has ERR_NOT_OWNER -1
+    You are not the owner of this creep, or the room controller is owned or reserved by another player.

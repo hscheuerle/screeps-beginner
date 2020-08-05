@@ -57,6 +57,29 @@ export function runPioneers(): void {
         });
 }
 
+export function runRemoteMiners() {
+    Object.entries(Game.creeps)
+        .filter(([, creep]) => creep.memory.role === "remote-miner")
+        .forEach(([, remoteMiner]) => {
+            const { flagName } = remoteMiner.memory;
+            if (!flagName) return;
+            const flag = Game.flags[flagName];
+            if (!flag) return;
+            try {
+                const energy = flag.pos.findClosestByRange(FIND_SOURCES) as Source;
+                console.log(energy);
+                const res = remoteMiner.harvest(energy as Source);
+                if (res === ERR_NOT_IN_RANGE) {
+                    remoteMiner.moveTo(energy);
+                } else {
+                    console.log("!!!" + res);
+                }
+            } catch {
+                remoteMiner.moveTo(flag);
+            }
+        });
+}
+
 export function runDefense() {
     Object.entries(Game.creeps)
         .filter(([, creep]) => creep.memory.role === "defense")

@@ -4,14 +4,28 @@
 
 // memory extension samples
 interface CreepMemory {
-    role: "homestead" | "pioneer";
+    role: "homestead" | "pioneer" | "defense" | "claimer" | "remote-miner";
+    flagName?: string;
     room: string;
     working: boolean;
+    sourceId: string;
 }
 
 interface Memory {
     uuid: number;
     log: any;
+    spawner: {
+        [roomName: string]: {
+            [sourceId: string]: {
+                role: string;
+                count: number;
+            };
+        };
+    };
+    remote: {
+        [flagName: string]: number;
+    };
+    alarmSounded: boolean;
 }
 
 // `global` extension samples

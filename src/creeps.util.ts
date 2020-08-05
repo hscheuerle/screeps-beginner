@@ -37,13 +37,19 @@ export function buildClosestConstructionSite(creep: Creep): boolean {
 
 export function harvestSource(creep: Creep, resource: Source | null): boolean {
     if (!resource) {
+        console.log("no resource");
         return false;
     }
 
     const res = creep.harvest(resource);
 
     if (res === ERR_NOT_IN_RANGE) {
-        creep.moveTo(resource.pos.x, resource.pos.y);
+        const moveRes = creep.moveTo(resource.pos.x, resource.pos.y); // this doesn't work because rooms are messed up
+        console.log("not in range", moveRes);
+    } else if (res === OK) {
+        console.log(creep.room, "ok", creep.memory.sourceId);
+    } else {
+        console.log(creep.room, "err", res);
     }
 
     return true;
@@ -93,4 +99,13 @@ export function upgradeController(creep: Creep, controller: StructureController 
     }
 
     return true;
+}
+
+export function cleanupCreepMemory() {
+    // Automatically delete memory of missing creeps
+    for (const name in Memory.creeps) {
+        if (!(name in Game.creeps)) {
+            delete Memory.creeps[name];
+        }
+    }
 }

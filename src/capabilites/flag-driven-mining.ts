@@ -18,23 +18,40 @@ export const spawnFlagCreepCheck = (): boolean => {
 
 // check if sufficient creeps assigned to flag.
 
-const flagDataForSpawn = () => {
-    return Object.values(Game.flags).filter(flagIsParsable).map(flagToFlagData).find(flagDataNeedsSpawn);
-};
-const flagIsParsable = (flag: Flag) => flag.name.startsWith("p:");
-const flagToFlagData = (flag: Flag) => ({ flag: flag, count: parseInt(flag.name.split(":")[1], 10) });
-const flagDataNeedsSpawn = (flagData: FlagData) =>
-    Object.values(Game.creeps).filter(creep => creep.memory.flagName === flagData.flag.name).length < flagData.count;
+function flagDataForSpawn() {
+    return Object.values(Game.flags)
+        .filter(flagIsParsable)
+        .map(flagToFlagData)
+        .find(flagDataNeedsSpawn);
+}
+function flagIsParsable(flag: Flag) {
+    return flag.name.startsWith("p:");
+}
+function flagToFlagData(flag: Flag) {
+    return { flag, count: parseInt(flag.name.split(":")[1], 10) };
+}
+function flagDataNeedsSpawn(flagData: FlagData) {
+    const { name } = flagData.flag;
+    const flags = Object.values(Game.creeps).filter(
+        creep => creep.memory.flagName === name
+    );
+    return flags.length < flagData.count;
+}
 
 function spawnFlagCreep(requiredCreep: { flag: Flag; count: number }) {
     const spawn = Game.spawns.Spawn1;
-    spawn.spawnCreep(getBuild(spawn.room.energyAvailable), `remote-${Game.time}`, {
-        memory: {
-            role: "remote-miner",
-            flagName: requiredCreep.flag.name,
-            room: spawn.room.name,
-            sourceId: "",
-            working: true
+    spawn.spawnCreep(
+        getBuild(spawn.room.energyAvailable),
+        `remote-${Game.time}`,
+        {
+            memory: {
+                role: "remote-miner",
+                flagName: requiredCreep.flag.name,
+                room: spawn.room.name,
+                sourceId: "",
+                working: true,
+                renewing: false
+            }
         }
-    });
+    );
 }

@@ -9,6 +9,7 @@ interface CreepMemory {
     room: string;
     working: boolean;
     sourceId: string;
+    renewing: boolean;
 }
 
 interface Memory {

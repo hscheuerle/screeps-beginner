@@ -4,71 +4,63 @@ const RESOURCE = Game.spawns.Spawn1.pos.findClosestByRange(FIND_SOURCES);
 const CONTROLLER = Game.spawns.Spawn1.room.controller || null;
 
 // TODO: now that this is so small, group this function in same file as pioneer in creeps.ts
-export function runHomesteads(): void {
+export const runHomesteads = (): void => {
     Object.entries(Game.creeps)
         .filter(([, creep]) => creep.memory.role === "homestead")
         .forEach(([, homestead]) => {
-            uc.setHarvestingState(homestead);
+            uc.updateRenewingState(homestead);
+            uc.updateWorkingState(homestead);
 
-            if (homestead.memory.working) {
-                uc.harvestSource(homestead, RESOURCE);
-            } else if (uc.transferSpawn(homestead, Game.spawns.Spawn1)) {
-                console.log("transferSpawn");
-            }
-            // GCL not my cl!!!
-            else if (uc.upgradeController(homestead, CONTROLLER)) {
-                console.log("upgradeController");
-            } else {
-                console.log("do nothing");
-            }
+            if (uc.renewCreep(homestead)) return;
+            if (uc.harvestSource(homestead, RESOURCE)) return;
+            if (uc.transferSpawn(homestead, Game.spawns.Spawn1)) return;
+            if (uc.upgradeController(homestead, CONTROLLER)) return;
         });
-}
+};
 
-export function runPioneers(): void {
+export const runPioneers = (): void => {
     Object.entries(Game.creeps)
         .filter(([, creep]) => creep.memory.role === "pioneer")
         .forEach(([, pioneer]) => {
-            // if (pioneer.room.name != pioneer.memory.room) {
-            //     const exitDir = Game.map.findExit(pioneer.room, pioneer.memory.room);
-            //     if (exitDir) {
-            //         const exit = pioneer.pos.findClosestByRange(exitDir as any);
-            //         pioneer.moveTo(exit as any);
-            //         return;
-            //     }
-            // }
+            uc.updateRenewingState(pioneer);
+            uc.updateWorkingState(pioneer);
 
-            uc.setHarvestingState(pioneer);
+            if (uc.renewCreep(pioneer)) return;
 
             if (pioneer.memory.working) {
-                const source = Game.getObjectById(pioneer.memory.sourceId) as Source;
+                const source = Game.getObjectById(
+                    pioneer.memory.sourceId
+                ) as Source;
                 if (!source) {
                     pioneer.moveTo(10, 0);
                 } else {
                     uc.harvestSource(pioneer, source);
                     console.log("harvest", pioneer.memory.sourceId);
                 }
-            } else if (uc.transferAnyContainer(pioneer)) {
-                console.log("transferAnyContainer");
-            } else if (uc.buildClosestConstructionSite(pioneer)) {
-                console.log("buildClosestConstructionSite");
-            } else if (uc.upgradeController(pioneer, CONTROLLER)) {
-                console.log("do nothing");
+                return;
             }
+            if (uc.transferAnyContainer(pioneer)) return;
+            if (uc.buildClosestConstructionSite(pioneer)) return;
+            if (uc.upgradeController(pioneer, CONTROLLER)) return;
         });
-}
+};
 
-export function runRemoteMiners() {
+export const runRemoteMiners = (): void => {
     Object.entries(Game.creeps)
         .filter(([, creep]) => creep.memory.role === "remote-miner")
         .forEach(([, remoteMiner]) => {
-            uc.setHarvestingState(remoteMiner);
+            uc.updateRenewingState(remoteMiner);
+            uc.updateWorkingState(remoteMiner);
+
+            if (uc.renewCreep(remoteMiner)) return;
             if (harvestRemote(remoteMiner)) return;
             if (uc.buildClosestConstructionSite(remoteMiner)) return;
+            if (uc.transferAnyContainer(remoteMiner)) return;
             if (uc.upgradeController(remoteMiner, CONTROLLER)) return;
         });
-}
+};
 
-export function runDefense() {
+export const runDefense = (): void => {
     Object.entries(Game.creeps)
         .filter(([, creep]) => creep.memory.role === "defense")
         .forEach(([, defender]) => {
@@ -89,9 +81,9 @@ export function runDefense() {
                 }
             }
         });
-}
+};
 
-export function runClaim() {
+export const runClaim = (): void => {
     Object.entries(Game.creeps)
         .filter(([, creep]) => creep.memory.role === "claimer")
         .forEach(([, claimer]) => {
@@ -114,13 +106,14 @@ export function runClaim() {
                 }
             }
         });
-}
+};
 
 // Game.spawns.Spawn1.room.createConstructionSite(source.pos.x - 2, source.pos.y, STRUCTURE_EXTENSION);
 // Game.spawns.Spawn1.room.createConstructionSite(source.pos.x + 2, source.pos.y, STRUCTURE_EXTENSION);
 // Game.spawns.Spawn1.room.createConstructionSite(source.pos.x, source.pos.y - 2, STRUCTURE_EXTENSION);
 // Game.spawns.Spawn1.room.createConstructionSite(source.pos.x, source.pos.y + 2, STRUCTURE_EXTENSION);
 
+// KEEP: harvestRemoteSafe not working
 export function harvestRemote(remoteMiner: Creep): boolean {
     if (!remoteMiner.memory.working) return false;
 
@@ -132,12 +125,11 @@ export function harvestRemote(remoteMiner: Creep): boolean {
 
     try {
         const energy = flag.pos.findClosestByRange(FIND_SOURCES) as Source;
-        console.log(energy);
-        const res = remoteMiner.harvest(energy as Source);
+        const res = remoteMiner.harvest(energy);
         if (res === ERR_NOT_IN_RANGE) {
             remoteMiner.moveTo(energy);
         } else {
-            console.log("!!!" + res);
+            console.log(`err ${res}`);
         }
     } catch {
         remoteMiner.moveTo(flag);

@@ -3,12 +3,22 @@
  */
 
 // rename toggle harvest toggle working? something?
-export function setHarvestingState(creep: Creep): void {
+export function updateWorkingState(creep: Creep): void {
     if (isEmpty(creep)) {
         creep.memory.working = true;
     }
     if (isFull(creep)) {
         creep.memory.working = false;
+    }
+}
+
+export function updateRenewingState(creep: Creep): void {
+    if (
+        creep.ticksToLive &&
+        creep.ticksToLive < 300 &&
+        creep.getActiveBodyparts(WORK) >= 5
+    ) {
+        creep.memory.renewing = true;
     }
 }
 
@@ -21,7 +31,9 @@ export function isFull(creep: Creep): boolean {
 }
 
 export function buildClosestConstructionSite(creep: Creep): boolean {
-    const constructionSite = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
+    const constructionSite = creep.pos.findClosestByRange(
+        FIND_MY_CONSTRUCTION_SITES
+    );
 
     if (!constructionSite) {
         return false;
@@ -41,6 +53,8 @@ export function harvestSource(creep: Creep, resource: Source | null): boolean {
         return false;
     }
 
+    if (!creep.memory.working) return false;
+
     const res = creep.harvest(resource);
 
     if (res === ERR_NOT_IN_RANGE) {
@@ -55,7 +69,10 @@ export function harvestSource(creep: Creep, resource: Source | null): boolean {
     return true;
 }
 
-export function transferSpawn(creep: Creep, spawnStructure: StructureSpawn): boolean {
+export function transferSpawn(
+    creep: Creep,
+    spawnStructure: StructureSpawn
+): boolean {
     if (spawnStructure.store.getFreeCapacity(RESOURCE_ENERGY) === 0) {
         return false;
     }
@@ -72,7 +89,10 @@ export function transferSpawn(creep: Creep, spawnStructure: StructureSpawn): boo
 export function transferAnyContainer(creep: Creep): boolean {
     const emptyContainers = creep.room.find(FIND_MY_STRUCTURES, {
         filter(object) {
-            return object.structureType === STRUCTURE_EXTENSION && object.store.getFreeCapacity(RESOURCE_ENERGY) !== 0;
+            return (
+                object.structureType === STRUCTURE_EXTENSION &&
+                object.store.getFreeCapacity(RESOURCE_ENERGY) !== 0
+            );
         }
     });
 
@@ -88,7 +108,10 @@ export function transferAnyContainer(creep: Creep): boolean {
     return true;
 }
 
-export function upgradeController(creep: Creep, controller: StructureController | null): boolean {
+export function upgradeController(
+    creep: Creep,
+    controller: StructureController | null
+): boolean {
     if (!controller) {
         return false;
     }
@@ -101,7 +124,68 @@ export function upgradeController(creep: Creep, controller: StructureController 
     return true;
 }
 
-export function cleanupCreepMemory() {
+export const harvestRemoteSafe = (creep: Creep): boolean => {
+    if (!creep.memory.working) return false;
+
+    const { flagName } = creep.memory;
+    if (!flagName) return false;
+
+    const flag = Game.flags[flagName];
+    if (!flag) return false;
+
+    if (flag.room?.name !== creep.room.name) {
+        creep.moveTo(flag);
+        return true;
+    }
+
+    const source = flag.room
+        .lookAt(flag)
+        .filter(object => object.type === "source")
+        .map(object => object.source)
+        .find(() => true);
+    if (!source) return false;
+
+    const res = creep.harvest(source);
+    if (res === OK) {
+        return true;
+    }
+    if (res === ERR_NOT_IN_RANGE) {
+        creep.moveTo(source);
+        return true;
+    }
+
+    console.log("err harvest remote safe: ", res);
+    return true;
+};
+
+// need memory to know when process has started, and only unsets when returns -8.
+export function renewCreep(creep: Creep): boolean {
+    if (creep.memory.renewing === undefined) return false;
+    if (creep.memory.renewing === false) return false;
+
+    const spawn = Game.spawns.Spawn1;
+    const res = spawn.renewCreep(creep);
+
+    if (res === ERR_FULL) {
+        creep.memory.renewing = false;
+        return false;
+    }
+
+    if (res === ERR_NOT_IN_RANGE) {
+        creep.moveTo(spawn);
+        return true;
+    }
+
+    if (res === ERR_NOT_ENOUGH_ENERGY) {
+        creep.transfer(spawn, RESOURCE_ENERGY);
+        creep.memory.renewing = false;
+        return true;
+    }
+
+    return true;
+}
+
+export function cleanupCreepMemory(): void {
     // Automatically delete memory of missing creeps
     for (const name in Memory.creeps) {
         if (!(name in Game.creeps)) {

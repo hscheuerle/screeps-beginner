@@ -7,42 +7,45 @@
 // - send a notification if possible to email.
 // - add attack "role:antibody" units to queue.
 // -
-export const checkAlarms = () => {
+export function checkAlarms(): void {
     if (!isAlarmAlreadyTripped()) return;
     if (!isEnemyInSpawnRoom()) return;
     tripAlarm();
     deployCounterMeasures();
-};
+}
 
-const deployCounterMeasures = () => {
+function deployCounterMeasures() {
     sendNotificationToEmail(getOwnerOfUnit());
     enableSafeModeIfAvailable();
-};
+}
 
-const getOwnerOfUnit = (): string => {
+function getOwnerOfUnit(): string {
     try {
-        return Game.spawns.Spawn1.room.find(FIND_HOSTILE_CREEPS)[0].owner.username;
+        return Game.spawns.Spawn1.room.find(FIND_HOSTILE_CREEPS)[0].owner
+            .username;
     } catch {
         return "username-not-captured-somehow";
     }
-};
+}
 
-const isEnemyInSpawnRoom = (): boolean => {
+function isEnemyInSpawnRoom(): boolean {
     return Game.spawns.Spawn1.room.find(FIND_HOSTILE_CREEPS).length > 0;
-};
+}
 
-const enableSafeModeIfAvailable = (): boolean => {
+function enableSafeModeIfAvailable(): boolean {
     return Game.spawns.Spawn1.room.controller?.activateSafeMode() === 0;
-};
+}
 
-const sendNotificationToEmail = (enemyUsername: string): void => {
-    Game.notify(`hostile unit detected in spawn room. username: ${enemyUsername}`);
-};
+function sendNotificationToEmail(enemyUsername: string): void {
+    Game.notify(
+        `hostile unit detected in spawn room. username: ${enemyUsername}`
+    );
+}
 
-const isAlarmAlreadyTripped = () => {
+function isAlarmAlreadyTripped(): boolean {
     return Memory.alarmSounded;
-};
+}
 
-const tripAlarm = () => {
+function tripAlarm(): void {
     Memory.alarmSounded = true;
-};
+}

@@ -54,23 +54,22 @@ export function transferSpawn(
 }
 
 export function transferAnyContainer(creep: Creep): boolean {
-    const emptyContainers = creep.room.find(FIND_MY_STRUCTURES, {
-        filter(object) {
+    const target = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+        filter: object => {
             return (
                 (object.structureType === STRUCTURE_EXTENSION ||
-                    object.structureType === STRUCTURE_TOWER) &&
+                    object.structureType === STRUCTURE_TOWER ||
+                    object.structureType === STRUCTURE_SPAWN) &&
                 object.store.getFreeCapacity(RESOURCE_ENERGY) !== 0
             );
         }
     });
 
-    if (emptyContainers.length === 0) {
-        return false;
-    }
+    if (!target) return false;
 
-    const res = creep.transfer(emptyContainers[0], RESOURCE_ENERGY);
+    const res = creep.transfer(target, RESOURCE_ENERGY);
     if (res === ERR_NOT_IN_RANGE) {
-        creep.moveTo(emptyContainers[0], {
+        creep.moveTo(target, {
             visualizePathStyle: { stroke: "#ff0000" }
         });
     }

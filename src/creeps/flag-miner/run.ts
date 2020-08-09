@@ -2,6 +2,7 @@ import {
     buildClosestConstructionSite,
     renewCreep,
     transferAnyContainer,
+    transferSpawn,
     upgradeController
 } from "creeps/shared/actions";
 import { isEmpty, isFull, updateRenewingState } from "creeps/shared/utilities";
@@ -42,6 +43,11 @@ function mine(creep: FlagMiner): boolean {
 }
 
 function transfer(creep: FlagMiner): boolean {
+    if (creep.memory.flagMiner.flagName.endsWith("home")) {
+        return (
+            transferSpawn(creep, Game.spawns.Spawn1) || upgradeController(creep)
+        );
+    }
     return (
         transferAnyContainer(creep) ||
         buildClosestConstructionSite(creep) ||

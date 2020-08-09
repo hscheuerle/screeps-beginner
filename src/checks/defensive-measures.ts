@@ -7,11 +7,12 @@
 // - send a notification if possible to email.
 // - add attack "role:antibody" units to queue.
 // -
-export function checkAlarms(): void {
-    if (!isAlarmAlreadyTripped()) return;
-    if (!isEnemyInSpawnRoom()) return;
+export function checkAlarms(): boolean {
+    if (!isAlarmAlreadyTripped()) return false;
+    if (!isEnemyInSpawnRoom()) return false;
     tripAlarm();
     deployCounterMeasures();
+    return true;
 }
 
 function deployCounterMeasures() {

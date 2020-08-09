@@ -54,29 +54,9 @@ export const Workers = {
     1250: [...parts(WORK, 7), ...parts(CARRY, 2), ...parts(MOVE, 9)],
     1300: [...parts(WORK, 6), ...parts(CARRY, 4), ...parts(MOVE, 10)] // 14 * 50
 } as const;
-// for WORK, f(1) = 250 - 350, f(2) = 400 - 500, f(3) = 550 - 650, f(4) = 700 - 800
 
 export const Offense = {
-    ATTACK: [
-        ATTACK,
-        ATTACK,
-        ATTACK,
-        ATTACK,
-        TOUGH,
-        TOUGH,
-        TOUGH,
-        TOUGH,
-        TOUGH,
-        TOUGH,
-        MOVE,
-        MOVE,
-        MOVE,
-        MOVE,
-        MOVE,
-        MOVE,
-        MOVE,
-        MOVE
-    ],
+    ATTACK: [...parts(ATTACK, 4), ...parts(TOUGH, 4), ...parts(MOVE, 8)],
     CLAIM: [CLAIM, ...parts(MOVE, 4)]
 };
 

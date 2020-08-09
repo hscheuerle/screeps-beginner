@@ -1,35 +1,3 @@
-/*
- * closestX methods don't need target parameter.
- */
-
-// rename toggle harvest toggle working? something?
-export function updateWorkingState(creep: Creep): void {
-    if (isEmpty(creep)) {
-        creep.memory.working = true;
-    }
-    if (isFull(creep)) {
-        creep.memory.working = false;
-    }
-}
-
-export function updateRenewingState(creep: Creep): void {
-    if (
-        creep.ticksToLive &&
-        creep.ticksToLive < 300 &&
-        creep.getActiveBodyparts(WORK) >= 5
-    ) {
-        creep.memory.renewing = true;
-    }
-}
-
-export function isEmpty(creep: Creep): boolean {
-    return creep.store[RESOURCE_ENERGY] === 0;
-}
-
-export function isFull(creep: Creep): boolean {
-    return creep.store.getFreeCapacity(RESOURCE_ENERGY) === 0;
-}
-
 export function buildClosestConstructionSite(creep: Creep): boolean {
     const constructionSite = creep.pos.findClosestByRange(
         FIND_MY_CONSTRUCTION_SITES
@@ -53,15 +21,14 @@ export function harvestSource(creep: Creep, resource: Source | null): boolean {
         return false;
     }
 
-    if (!creep.memory.working) return false;
-
     const res = creep.harvest(resource);
 
     if (res === ERR_NOT_IN_RANGE) {
-        const moveRes = creep.moveTo(resource.pos.x, resource.pos.y); // this doesn't work because rooms are messed up
-        console.log("not in range", moveRes);
-    } else if (res === OK) {
-        console.log(creep.room, "ok", creep.memory.sourceId);
+        creep.moveTo(resource.pos.x, resource.pos.y); // this doesn't work because rooms are messed up
+        return true;
+    }
+    if (res === OK) {
+        return true;
     } else {
         console.log(creep.room, "err", res);
     }
@@ -90,7 +57,8 @@ export function transferAnyContainer(creep: Creep): boolean {
     const emptyContainers = creep.room.find(FIND_MY_STRUCTURES, {
         filter(object) {
             return (
-                object.structureType === STRUCTURE_EXTENSION &&
+                (object.structureType === STRUCTURE_EXTENSION ||
+                    object.structureType === STRUCTURE_TOWER) &&
                 object.store.getFreeCapacity(RESOURCE_ENERGY) !== 0
             );
         }
@@ -102,32 +70,34 @@ export function transferAnyContainer(creep: Creep): boolean {
 
     const res = creep.transfer(emptyContainers[0], RESOURCE_ENERGY);
     if (res === ERR_NOT_IN_RANGE) {
-        creep.moveTo(emptyContainers[0]);
+        creep.moveTo(emptyContainers[0], {
+            visualizePathStyle: { stroke: "#ff0000" }
+        });
     }
 
     return true;
 }
 
-export function upgradeController(
-    creep: Creep,
-    controller: StructureController | null
-): boolean {
+export function upgradeController(creep: Creep): boolean {
+    const controller = Game.spawns.Spawn1.room.controller;
+
     if (!controller) {
+        console.log("no controller?");
         return false;
     }
 
     const res = creep.upgradeController(controller);
     if (res === ERR_NOT_IN_RANGE) {
         creep.moveTo(controller);
+        return true;
     }
 
-    return true;
+    console.log(`upgradeController error: ${res} on: ${creep.name} `);
+    return false;
 }
 
-export const harvestRemoteSafe = (creep: Creep): boolean => {
-    if (!creep.memory.working) return false;
-
-    const { flagName } = creep.memory;
+export const harvestRemoteSafe = (creep: FlagMiner): boolean => {
+    const { flagName } = creep.memory.flagMiner;
     if (!flagName) return false;
 
     const flag = Game.flags[flagName];

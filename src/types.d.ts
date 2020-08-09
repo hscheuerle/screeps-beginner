@@ -1,15 +1,36 @@
 // example declaration file - remove these and add your own custom typings
 
-// import { Role } from "consts";
+// import { FlagMinerMemory } from "creeps/flag-miner/models";
+// import { ScavengerMemory } from "creeps/scavenger/models";
 
-// memory extension samples
 interface CreepMemory {
-    role: "homestead" | "pioneer" | "defense" | "claimer" | "remote-miner";
-    flagName?: string;
-    room: string;
-    working: boolean;
-    sourceId: string;
+    role: "scavenger" | "flag-miner" | "defender";
     renewing: boolean;
+}
+
+interface ScavengerMemory extends CreepMemory {
+    role: "scavenger";
+    scavenger: { scavenging: boolean };
+}
+interface FlagMinerMemory extends CreepMemory {
+    role: "flag-miner";
+    flagMiner: { flagName: string; mining: boolean };
+}
+
+interface DefenderMemory extends CreepMemory {
+    role: "defender";
+}
+
+interface Scavenger extends Creep {
+    memory: ScavengerMemory;
+}
+
+interface FlagMiner extends Creep {
+    memory: FlagMinerMemory;
+}
+
+interface Defender extends Creep {
+    memory: DefenderMemory;
 }
 
 interface Memory {

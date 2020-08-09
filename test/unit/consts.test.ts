@@ -1,4 +1,4 @@
-import { costToBody } from "consts";
+import { costToBody } from "creeps/shared/consts";
 import { assert } from "chai";
 
 describe("creep body costs", () => {

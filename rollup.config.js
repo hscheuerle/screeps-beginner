@@ -12,26 +12,28 @@ import typescript from "rollup-plugin-typescript2";
 let cfg;
 const dest = process.env.DEST;
 if (!dest) {
-  console.log("No destination specified - code will be compiled but not uploaded");
+    console.log(
+        "No destination specified - code will be compiled but not uploaded"
+    );
 } else if ((cfg = require("./screeps.json")[dest]) == null) {
-  throw new Error("Invalid upload destination");
+    throw new Error("Invalid upload destination");
 }
 
 export default {
-  input: "src/main.ts",
-  output: {
-    file: "dist/main.js",
-    format: "cjs",
-    sourcemap: true
-  },
+    input: "src/main.ts",
+    output: {
+        file: "dist/main.js",
+        format: "cjs",
+        sourcemap: true
+    },
 
-  plugins: [
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    clear({ targets: ["dist"] }),
-    resolve(),
-    commonjs(),
-    typescript({ tsconfig: "./tsconfig.json" }),
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    screeps({ config: cfg, dryRun: cfg == null })
-  ]
+    plugins: [
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        clear({ targets: ["dist"] }),
+        resolve(),
+        commonjs(),
+        typescript({ tsconfig: "./tsconfig.json" }),
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        screeps({ config: cfg, dryRun: cfg == null })
+    ]
 };

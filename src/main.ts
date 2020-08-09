@@ -1,18 +1,28 @@
-import * as roles from "./creeps";
-import * as rooms from "rooms";
+import { checkScavengerSpawn, runScavengers } from "creeps/scavenger";
 import { ErrorMapper } from "utils/ErrorMapper";
-import { checkAlarms } from "capabilites/defensive-measures";
-import { cleanupCreepMemory } from "creeps.util";
+import { atLeastOneDefense } from "creeps/defender/spawn";
+import { checkAlarms } from "checks/defensive-measures";
+import { cleanupCreepMemory } from "creeps/shared/creeps.util";
+import { runDefenders } from "creeps/defender/run";
+import { runFlagMiners } from "creeps/flag-miner/run";
+import { spawnFlagCreepCheck } from "creeps/flag-miner/spawn";
 
-rooms.spawnerSetup();
+Memory.alarmSounded = false;
 export const loop = ErrorMapper.wrapLoop(() => {
-    Memory.alarmSounded = false;
     checkAlarms();
     cleanupCreepMemory();
-    rooms.spawnerLoop(); // TODO: will fail in sim, since it doesn't account for that op unit by the one resource!
-    roles.runHomesteads();
-    roles.runPioneers();
-    roles.runDefense();
-    roles.runRemoteMiners();
-    // roles.runClaim();
+
+    spawnerLoop();
+    runLoop();
 });
+
+function spawnerLoop(): void {
+    if (atLeastOneDefense() || spawnFlagCreepCheck() || checkScavengerSpawn())
+        return;
+}
+
+function runLoop(): void {
+    runScavengers();
+    runFlagMiners();
+    runDefenders();
+}

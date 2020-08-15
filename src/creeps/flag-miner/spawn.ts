@@ -79,15 +79,34 @@ function tryRepurposeCreep(requiredCreep: {
         creep => !activeRoles.includes(creep.memory.role)
     );
 
-    console.log("Got here", oldCreep?.name);
+    // TODO: reduce unique werid lint error.
+    const flagNames = Object.values(Game.flags).map(flag => flag.name);
 
-    if (!oldCreep) return false;
-    const memory: FlagMinerMemory = {
-        role: "flag-miner",
-        flagMiner: { flagName: requiredCreep.flag.name, mining: true },
-        renewing: false
-    };
-    Memory.creeps[oldCreep.name] = memory;
+    const flagCreeps = Object.values(Game.creeps).filter(
+        creep => creep.memory.role === "flag-miner"
+    ) as FlagMiner[];
+
+    const oldFlagCreep = flagCreeps.find(creep => {
+        return !flagNames.includes(creep.memory.flagMiner.flagName);
+    });
+
+    if (!oldCreep && !oldFlagCreep) return false;
+
+    if (oldCreep) {
+        const memory: FlagMinerMemory = {
+            role: "flag-miner",
+            flagMiner: { flagName: requiredCreep.flag.name, mining: true },
+            renewing: false
+        };
+        Memory.creeps[oldCreep.name] = memory;
+    } else if (oldFlagCreep) {
+        const memory: FlagMinerMemory = {
+            role: "flag-miner",
+            flagMiner: { flagName: requiredCreep.flag.name, mining: true },
+            renewing: false
+        };
+        Memory.creeps[oldFlagCreep.name] = memory;
+    }
 
     return true;
 }

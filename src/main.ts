@@ -25,4 +25,16 @@ function runLoop(): void {
     runScavengers();
     runFlagMiners();
     runDefenders();
+    runTowers();
+}
+
+function runTowers() {
+    const towers = Object.values(Game.structures).filter(
+        structure => structure.structureType === STRUCTURE_TOWER
+    ) as StructureTower[];
+
+    towers.forEach(tower => {
+        const hostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
+        if (hostile) tower.attack(hostile);
+    });
 }

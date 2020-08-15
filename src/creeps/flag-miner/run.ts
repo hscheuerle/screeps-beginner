@@ -44,9 +44,7 @@ function mine(creep: FlagMiner): boolean {
 
 function transfer(creep: FlagMiner): boolean {
     if (creep.memory.flagMiner.flagName.endsWith("home")) {
-        return (
-            transferSpawn(creep, Game.spawns.Spawn1) || upgradeController(creep)
-        );
+        return upgradeController(creep);
     }
     return (
         transferAnyContainer(creep) ||

@@ -14,7 +14,6 @@ export function harvestRemote(creep: FlagMiner): boolean {
         const res = creep.harvest(energy);
         if (res === ERR_NOT_IN_RANGE) {
             creep.moveTo(energy, {
-                ignoreCreeps: true,
                 visualizePathStyle: { stroke: "#ffffff" }
             });
         } else {

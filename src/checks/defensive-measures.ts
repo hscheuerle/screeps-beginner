@@ -8,7 +8,7 @@
 // - add attack "role:antibody" units to queue.
 // -
 export function checkAlarms(): boolean {
-    if (!isAlarmAlreadyTripped()) return false;
+    if (isAlarmAlreadyTripped()) return false;
     if (!isEnemyInSpawnRoom()) return false;
     tripAlarm();
     deployCounterMeasures();

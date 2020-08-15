@@ -58,8 +58,7 @@ export function transferAnyContainer(creep: Creep): boolean {
         filter: object => {
             return (
                 (object.structureType === STRUCTURE_EXTENSION ||
-                    object.structureType === STRUCTURE_TOWER ||
-                    object.structureType === STRUCTURE_SPAWN) &&
+                    object.structureType === STRUCTURE_TOWER) &&
                 object.store.getFreeCapacity(RESOURCE_ENERGY) !== 0
             );
         }

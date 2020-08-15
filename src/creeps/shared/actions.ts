@@ -77,7 +77,9 @@ export function transferAnyContainer(creep: Creep): boolean {
 }
 
 export function upgradeController(creep: Creep): boolean {
-    const controller = Game.spawns.Spawn1.room.controller;
+    const controller = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+        filter: { structureType: STRUCTURE_CONTROLLER }
+    }) as StructureController | null;
 
     if (!controller) {
         console.log("no controller?");

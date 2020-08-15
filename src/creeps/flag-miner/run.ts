@@ -2,7 +2,6 @@ import {
     buildClosestConstructionSite,
     renewCreep,
     transferAnyContainer,
-    transferSpawn,
     upgradeController
 } from "creeps/shared/actions";
 import { isEmpty, isFull, updateRenewingState } from "creeps/shared/utilities";

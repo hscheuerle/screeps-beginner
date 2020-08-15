@@ -4,7 +4,7 @@
 // import { ScavengerMemory } from "creeps/scavenger/models";
 
 interface CreepMemory {
-    role: "scavenger" | "flag-miner" | "defender";
+    role: "scavenger" | "flag-miner" | "defender" | "claimer";
     renewing: boolean;
 }
 
